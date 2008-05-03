@@ -47,6 +47,7 @@ string *file_format = new string(DEFAULT_FILE_FORMAT);          	// format of fi
 bool verbose = true;							// print extra information?
 string *output_directory = new string(DEFAULT_OUTPUT_DIRECTORY);	// directory to write images to
 bool webcam = false;							// getting input from a webcam?
+bool save_output = false;                                               // true when animation should be saved
 
 // error codes
 #define INVALID_INPUT_DIRECTORY 1

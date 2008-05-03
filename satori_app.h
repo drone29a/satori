@@ -55,13 +55,10 @@ private:
   Flow flow;
 
   // Images
-  IplImage *swap_img;
-
-  // Points to track
-  // CvPoint2D32f *prev_points, *curr_points, *swap_points;
+  IplImage *swap_temp;
 
   // Pyramids
-  IplImage *prev_pyramid, *curr_pyramid, *swap_pyramid;
+  IplImage *prev_pyramid, *pyramid;
 
   // Action Functions
   IplImage* annotate_img(IplImage*);

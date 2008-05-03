@@ -120,7 +120,9 @@ int main(int argc, char *argv[]){
   }
   
   // output a video to the proper folder
-  app->animate(out_path.native_directory_string());
+  if (save_output){
+      app->animate(out_path.native_directory_string());
+  }
   
   delete app;
   

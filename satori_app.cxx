@@ -33,15 +33,14 @@ SatoriApp::SatoriApp(){
 SatoriApp::~SatoriApp(){
     // Destructor
     // release all images
-    for(int i = 0; i < orig_images.size(); i++){
+    for(int i = 0; i < orig_images.size(); ++i){
         cvReleaseImage(&orig_images[i]);
         cvReleaseImage(&gray_images[i]);
         cvReleaseImage(&annotated_images[i]);
     }
 
     cvReleaseImage(&prev_pyramid);
-    cvReleaseImage(&curr_pyramid);
-    cvReleaseImage(&swap_pyramid);
+    cvReleaseImage(&pyramid);
 }
 
 // Access Functions
@@ -102,42 +101,36 @@ int SatoriApp::run_webcam(bool verbose){
             image = cvCreateImage(cvGetSize(frame), 8, 3);
             image->origin = frame->origin;
             grey = cvCreateImage(cvGetSize(frame), 8, 1);
-
-            // acquire usable image, grayscale it
-            cvCopy(frame, image, 0);
-            cvCvtColor(image, grey, CV_BGR2GRAY);
-
             prev_grey = cvCreateImage(cvGetSize(frame), 8, 1);
+            pyramid = cvCreateImage(cvGetSize(frame), IPL_DEPTH_8U, 1);	// initially NULL
+            prev_pyramid = cvCreateImage(cvGetSize(frame), IPL_DEPTH_8U, 1);  // initially NULL
+        }
 
-            // setup pyramids for flow
-            prev_pyramid = cvCreateImage(cvGetSize(prev_grey), IPL_DEPTH_8U, 1);	// initially NULL
-            curr_pyramid = cvCreateImage(cvGetSize(grey), IPL_DEPTH_8U, 1);	// initially NULL
-        }
-        else{ // update the reading
-            cvCopy(frame, image, 0);
-            cvCvtColor(image, grey, CV_BGR2GRAY);
-        }
+        cvCopy(frame, image, 0);
+        cvCvtColor(image, grey, CV_BGR2GRAY);
 
         // In case new features should be found
         if (need_flow_init){
             flow.init(grey);
+
+            need_flow_init = false;
         }
 
         // perform operations
         // update pairs with flow information
-        flow.pair_flow(prev_grey, prev_pyramid, grey, curr_pyramid);
+        flow.pair_flow(prev_grey, prev_pyramid, grey, pyramid);
         // track largest moving object
     
         // prepare for next captured picture
-        CV_SWAP(prev_grey, grey, swap_img);
-        CV_SWAP(prev_pyramid, curr_pyramid, swap_pyramid);
+        CV_SWAP(prev_grey, grey, swap_temp);
+        CV_SWAP(prev_pyramid, pyramid, swap_temp);
 
         // display webcam output        
         cvShowImage("Webcam_Capture", annotate_img(image));
 
         // Handle keyboard input
         key_ch = cvWaitKey(10);
-        if( (char)key_ch == 27 )
+        if( (char)key_ch == 27 )  // ESC key
             break;
         switch( (char) key_ch )
         {
