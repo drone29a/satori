@@ -42,8 +42,8 @@ Flow::~Flow(){
 void Flow::init(IplImage *initial_img){
 
     // set up state of machine for new run
-    prev_points = (CvPoint2D32f*)cvAlloc(MAX_POINTS_TO_TRACK*sizeof(0));	// initially NULL
-    curr_points = (CvPoint2D32f*)cvAlloc(MAX_POINTS_TO_TRACK*sizeof(0));	// initially NULL
+    prev_points = (CvPoint2D32f*)cvAlloc(MAX_POINTS_TO_TRACK*sizeof(prev_points[0]));	// initially NULL
+    curr_points = (CvPoint2D32f*)cvAlloc(MAX_POINTS_TO_TRACK*sizeof(curr_points[0]));	// initially NULL
     where_flow_found = (char*)cvAlloc(MAX_POINTS_TO_TRACK);		// initially NULL
 
     // setup pyramids for flow
@@ -54,12 +54,15 @@ void Flow::init(IplImage *initial_img){
     IplImage* eig = cvCreateImage(cvGetSize(initial_img), 32, 1);
     IplImage* temp = cvCreateImage(cvGetSize(initial_img), 32, 1);
     double quality = 0.01;
-    double min_distance = 10;
+    double min_distance = 5;
     num_tracked_points = MAX_POINTS_TO_TRACK;
 
     // detect number of features to track
-    cvGoodFeaturesToTrack(initial_img, eig, temp, curr_points, &num_tracked_points, quality, min_distance, 0, 3, 0, 0.04 );
-    cvFindCornerSubPix(initial_img, curr_points, num_tracked_points, cvSize(WINDOW_SIZE,WINDOW_SIZE), cvSize(-1,-1), cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
+    cvGoodFeaturesToTrack(initial_img, eig, temp, curr_points, &num_tracked_points, 
+                          quality, min_distance, 0, 3, 0, 0.04 );
+    cvFindCornerSubPix(initial_img, curr_points, num_tracked_points, 
+                       cvSize(WINDOW_SIZE,WINDOW_SIZE), cvSize(-1,-1), 
+                       cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03));
 
     // release temporary images
     cvReleaseImage(&eig);
@@ -68,14 +71,13 @@ void Flow::init(IplImage *initial_img){
 
 void Flow::pair_flow(IplImage* img1, IplImage* img2){
     // calculate flow and track points (modified Lucas & Kanade algorithm)
-    cvCalcOpticalFlowPyrLK(img1, img2, prev_pyramid, curr_pyramid, prev_points, curr_points, num_tracked_points, cvSize(WINDOW_SIZE,WINDOW_SIZE), 3, where_flow_found, 0, cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,2000,0.03), lk_flags);
+    cvCalcOpticalFlowPyrLK(img1, img2, 
+                           prev_pyramid, curr_pyramid, 
+                           prev_points, curr_points, num_tracked_points, 
+                           cvSize(WINDOW_SIZE,WINDOW_SIZE), 3, where_flow_found, 
+                           0, cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03), lk_flags);
 
     lk_flags |= CV_LKFLOW_PYR_A_READY; // A pyramid will be ready > 1st time
-
-    // DEBUGGING OUTPUT
-    for(int j = 0; j < num_tracked_points; j++){
-        cout << cvPointFrom32f(curr_points[j]).x << "  " << cvPointFrom32f(curr_points[j]).y << endl;
-    }
 
     // update points
     CV_SWAP(prev_pyramid, curr_pyramid, swap_pyramid);

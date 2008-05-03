@@ -53,3 +53,6 @@ clean:
 	rm -f *~*
 	rm -f $(POUT)
 
+# build TAGS
+tags: 	
+	etags *.cxx *.h *.tpl

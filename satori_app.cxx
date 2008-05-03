@@ -92,15 +92,15 @@ int SatoriApp::run_webcam(bool verbose){
             break;
 
         if(!image){	// initialize data structures the first time
-            image = cvCreateImage( cvGetSize(frame), 8, 3 );
+            image = cvCreateImage(cvGetSize(frame), 8, 3);
             image->origin = frame->origin;
-            grey = cvCreateImage( cvGetSize(frame), 8, 1 );
+            grey = cvCreateImage(cvGetSize(frame), 8, 1);
 
             // acquire usable image, grayscale it
             cvCopy(frame, image, 0);
             cvCvtColor(image, grey, CV_BGR2GRAY);
 
-            prev_grey = cvCreateImage(cvGetSize(frame), 8, 1 );
+            prev_grey = cvCreateImage(cvGetSize(frame), 8, 1);
 
             flow.init(grey);
         }
@@ -117,17 +117,13 @@ int SatoriApp::run_webcam(bool verbose){
         // prepare for next captured picture
         CV_SWAP(prev_grey, grey, swap_img);
 
-        // DEBUGGING OUTPUT
-        //     for(int i = 0; i < num_tracked_points; i++){
-        //       cvCircle(image, cvPointFrom32f(curr_points[i]), 3, CV_RGB(0,255,0), -1, 8,0);
-        //       cout << cvPointFrom32f(curr_points[i]).x << "  " << cvPointFrom32f(curr_points[i]).y << endl;
-        //     }
-
-        // display webcam output
-        cvShowImage("Webcam_Capture", image);
-        cvWaitKey(10);
+        // display webcam output        
+        cvShowImage("Webcam_Capture", annotate_img(image));
+        cvWaitKey(10);        
     }
         
+    cvReleaseCapture(&capture);
+    
     return 0;      
 }
 
@@ -248,8 +244,13 @@ IplImage* SatoriApp::annotate_img(IplImage* img){
 
     // add circles for each tracked point
     int num_tracked_points = flow.point_count();
-    for(int i = 0; i < num_tracked_points; i++)
-        cvCircle(img, cvPointFrom32f(flow.curr_points[i]), 3, CV_RGB(0,255,0), -1, 8,0);
+
+    //    cout << "num tracked: " << num_tracked_points << endl;
+    for(int i = 0; i < num_tracked_points; ++i) {
+        CvPoint pt = cvPointFrom32f(flow.curr_points[i]);
+        //        cout << "x: " << pt.x << "  y: " << pt.y << endl;
+        cvCircle(img, pt, 3, CV_RGB(0,255,0), -1, 8, 0);
+    }
     
     // return annotated image
     return img;
