@@ -271,7 +271,7 @@ IplImage* SatoriApp::annotate_img(IplImage* img){
 
     //    cout << "num tracked: " << num_tracked_points << endl;
     for(int i = 0; i < num_tracked_points; ++i) {
-        CvPoint pt = cvPointFrom32f(flow.curr_points[i]);
+        CvPoint pt = cvPointFrom32f(flow.points[i]);
         //        cout << "x: " << pt.x << "  y: " << pt.y << endl;
         cvCircle(img, pt, 3, CV_RGB(0,255,0), -1, 8, 0);
     }
