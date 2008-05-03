@@ -121,7 +121,7 @@ int SatoriApp::run_webcam(bool verbose){
         }
 
         // perform operations
-        if (do_flow){
+        if (do_flow && flow.point_count() > 0){
             // update pairs with flow information
             flow.pair_flow(prev_grey, prev_pyramid, grey, pyramid);
         }
