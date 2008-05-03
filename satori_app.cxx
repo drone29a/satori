@@ -267,12 +267,10 @@ void SatoriApp::animate(string outfolder, bool verbose){
 IplImage* SatoriApp::annotate_img(IplImage* img){
 
     // add circles for each tracked point
-    int num_tracked_points = flow.point_count();
+    int num_points = flow.point_count();
 
-    //    cout << "num tracked: " << num_tracked_points << endl;
-    for(int i = 0; i < num_tracked_points; ++i) {
+    for(int i = 0; i < num_points; ++i) {
         CvPoint pt = cvPointFrom32f(flow.points[i]);
-        //        cout << "x: " << pt.x << "  y: " << pt.y << endl;
         cvCircle(img, pt, 3, CV_RGB(0,255,0), -1, 8, 0);
     }
     
