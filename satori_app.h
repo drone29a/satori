@@ -44,12 +44,11 @@ private:
 
   // State of machine
   bool ran;				// whether differences have been calculated
-  char *where_flow_found;
-  int num_tracked_points;
-  int lk_flags;
   bool need_flow_init;
   bool need_track_init;
   char key_ch;
+  bool do_flow;
+  bool do_track;
   
   // Flow machine
   Flow flow;

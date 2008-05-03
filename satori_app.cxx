@@ -23,11 +23,14 @@ SatoriApp::SatoriApp(){
 
     // set up state of machine
     ran = false;  
-    need_flow_init = true;
+    
+    // do any components need init in run loop
+    need_flow_init = false;
     need_track_init = true;
-    where_flow_found = NULL;
-    num_tracked_points = 0;
-    lk_flags = 0;
+
+    // which components should be executed in run loop
+    do_flow = false;
+    do_track = false;
 }
 
 SatoriApp::~SatoriApp(){
@@ -114,12 +117,18 @@ int SatoriApp::run_webcam(bool verbose){
             flow.init(grey);
 
             need_flow_init = false;
+            do_flow = true;
         }
 
         // perform operations
-        // update pairs with flow information
-        flow.pair_flow(prev_grey, prev_pyramid, grey, pyramid);
+        if (do_flow){
+            // update pairs with flow information
+            flow.pair_flow(prev_grey, prev_pyramid, grey, pyramid);
+        }
+
+        if (do_track){
         // track largest moving object
+        }
     
         // prepare for next captured picture
         CV_SWAP(prev_grey, grey, swap_temp);
@@ -135,7 +144,7 @@ int SatoriApp::run_webcam(bool verbose){
         switch( (char) key_ch )
         {
         case 'f':
-            need_flow_init = 1;
+            need_flow_init = true;
             break;
         default:
             ;
@@ -165,11 +174,6 @@ int SatoriApp::run(bool verbose){
     img1->origin = gray_images[0]->origin;
     // acquire usable image, grayscale it
     cvCopy(gray_images[0], img1, 0);
-
-    // DEBUGGING OUTPUT
-    for(int j = 0; j < num_tracked_points; j++){
-        //cout << cvPointFrom32f(curr_points[j]).x << "  " << cvPointFrom32f(curr_points[j]).y << endl;
-    }
 
     // run flow algorithm on all remaining images
     for(int i = 0; i < orig_images.size() - 1; i++){
