@@ -52,8 +52,8 @@ class Flow{
  private:
     // State of machine
     bool ran;				// whether differences have been calculated
-    char* where_flow_found;
-    int num_tracked_points;
+    char* flow_pixels;
+    int _point_count;
     int lk_flags;
 
     // Points to track
