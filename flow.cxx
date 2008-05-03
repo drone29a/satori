@@ -54,6 +54,9 @@ void Flow::init(IplImage *initial_img){
     // release temporary images
     cvReleaseImage(&eig);
     cvReleaseImage(&temp);
+
+    // update points
+    CV_SWAP(prev_points, points, swap_points);
 }
 
 void Flow::pair_flow(IplImage* img1, IplImage* img1_pyr,
