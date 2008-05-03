@@ -24,32 +24,19 @@ Flow::Flow(){
     where_flow_found = NULL;
     num_tracked_points = 0;
     lk_flags = 0;
-    // Points to track
-    prev_points = NULL;
-    curr_points = NULL;
-    swap_points = NULL;
-}
-
-Flow::~Flow(){
-    // Destructor
-    // release all images
-    cvReleaseImage(&prev_pyramid);
-    cvReleaseImage(&curr_pyramid);
-    cvReleaseImage(&swap_pyramid);
-}
-
-// Action Functions
-void Flow::init(IplImage *initial_img){
 
     // set up state of machine for new run
     prev_points = (CvPoint2D32f*)cvAlloc(MAX_POINTS_TO_TRACK*sizeof(prev_points[0]));	// initially NULL
     curr_points = (CvPoint2D32f*)cvAlloc(MAX_POINTS_TO_TRACK*sizeof(curr_points[0]));	// initially NULL
     where_flow_found = (char*)cvAlloc(MAX_POINTS_TO_TRACK);		// initially NULL
+}
 
-    // setup pyramids for flow
-    prev_pyramid = cvCreateImage(cvGetSize(initial_img), IPL_DEPTH_8U, 1);	// initially NULL
-    curr_pyramid = cvCreateImage(cvGetSize(initial_img), IPL_DEPTH_8U, 1);	// initially NULL
+Flow::~Flow(){
+    // Destructor
+}
 
+// Action Functions
+void Flow::init(IplImage *initial_img){
     // get initial set for feature detection
     IplImage* eig = cvCreateImage(cvGetSize(initial_img), 32, 1);
     IplImage* temp = cvCreateImage(cvGetSize(initial_img), 32, 1);
@@ -69,10 +56,11 @@ void Flow::init(IplImage *initial_img){
     cvReleaseImage(&temp);
 }
 
-void Flow::pair_flow(IplImage* img1, IplImage* img2){
+void Flow::pair_flow(IplImage* img1, IplImage* img1_pyr,
+                     IplImage* img2, IplImage* img2_pyr){
     // calculate flow and track points (modified Lucas & Kanade algorithm)
     cvCalcOpticalFlowPyrLK(img1, img2, 
-                           prev_pyramid, curr_pyramid, 
+                           img1_pyr, img2_pyr, 
                            prev_points, curr_points, num_tracked_points, 
                            cvSize(WINDOW_SIZE,WINDOW_SIZE), 3, where_flow_found, 
                            0, cvTermCriteria(CV_TERMCRIT_ITER|CV_TERMCRIT_EPS,20,0.03), lk_flags);
@@ -80,7 +68,6 @@ void Flow::pair_flow(IplImage* img1, IplImage* img2){
     lk_flags |= CV_LKFLOW_PYR_A_READY; // A pyramid will be ready > 1st time
 
     // update points
-    CV_SWAP(prev_pyramid, curr_pyramid, swap_pyramid);
     CV_SWAP(prev_points, curr_points, swap_points);
 }
 

@@ -44,7 +44,8 @@ class Flow{
     
     // Action Functions
     void init(IplImage*);
-    void pair_flow(IplImage*,IplImage*);	// calculate the flow between two images
+    void pair_flow(IplImage* prev, IplImage* prev_pyr,
+                   IplImage* curr, IplImage* curr_pyr);	// calculate the flow between two images
     
     // Current points tracked
     CvPoint2D32f *curr_points;
@@ -57,9 +58,6 @@ class Flow{
 
     // Points to track
     CvPoint2D32f *prev_points, *swap_points;
-
-    // Pyramids
-    IplImage *prev_pyramid, *curr_pyramid, *swap_pyramid;
 };
 
 #endif

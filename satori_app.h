@@ -47,6 +47,9 @@ private:
   char *where_flow_found;
   int num_tracked_points;
   int lk_flags;
+  bool need_flow_init;
+  bool need_track_init;
+  char key_ch;
   
   // Flow machine
   Flow flow;
@@ -58,7 +61,7 @@ private:
   // CvPoint2D32f *prev_points, *curr_points, *swap_points;
 
   // Pyramids
-  // IplImage *prev_pyramid, *curr_pyramid, *swap_pyramid;
+  IplImage *prev_pyramid, *curr_pyramid, *swap_pyramid;
 
   // Action Functions
   IplImage* annotate_img(IplImage*);

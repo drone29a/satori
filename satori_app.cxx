@@ -1,3 +1,4 @@
+
 /*
  * satori_app.cxx - Satori Application
  * (c) 2008 Michael Sullivan
@@ -22,6 +23,8 @@ SatoriApp::SatoriApp(){
 
     // set up state of machine
     ran = false;  
+    need_flow_init = true;
+    need_track_init = true;
     where_flow_found = NULL;
     num_tracked_points = 0;
     lk_flags = 0;
@@ -35,6 +38,10 @@ SatoriApp::~SatoriApp(){
         cvReleaseImage(&gray_images[i]);
         cvReleaseImage(&annotated_images[i]);
     }
+
+    cvReleaseImage(&prev_pyramid);
+    cvReleaseImage(&curr_pyramid);
+    cvReleaseImage(&swap_pyramid);
 }
 
 // Access Functions
@@ -102,24 +109,44 @@ int SatoriApp::run_webcam(bool verbose){
 
             prev_grey = cvCreateImage(cvGetSize(frame), 8, 1);
 
-            flow.init(grey);
+            // setup pyramids for flow
+            prev_pyramid = cvCreateImage(cvGetSize(prev_grey), IPL_DEPTH_8U, 1);	// initially NULL
+            curr_pyramid = cvCreateImage(cvGetSize(grey), IPL_DEPTH_8U, 1);	// initially NULL
         }
         else{ // update the reading
             cvCopy(frame, image, 0);
             cvCvtColor(image, grey, CV_BGR2GRAY);
         }
 
+        // In case new features should be found
+        if (need_flow_init){
+            flow.init(grey);
+        }
+
         // perform operations
         // update pairs with flow information
-        flow.pair_flow(prev_grey, grey);
+        flow.pair_flow(prev_grey, prev_pyramid, grey, curr_pyramid);
         // track largest moving object
     
         // prepare for next captured picture
         CV_SWAP(prev_grey, grey, swap_img);
+        CV_SWAP(prev_pyramid, curr_pyramid, swap_pyramid);
 
         // display webcam output        
         cvShowImage("Webcam_Capture", annotate_img(image));
-        cvWaitKey(10);        
+
+        // Handle keyboard input
+        key_ch = cvWaitKey(10);
+        if( (char)key_ch == 27 )
+            break;
+        switch( (char) key_ch )
+        {
+        case 'f':
+            need_flow_init = 1;
+            break;
+        default:
+            ;
+        }
     }
         
     cvReleaseCapture(&capture);
@@ -184,7 +211,7 @@ int SatoriApp::run(bool verbose){
         // calculate flow between the two images (results modify private global variables)
         if(verbose)
             cout << "    * " << "Processing optical flow of image pair #" << i << "...";
-        flow.pair_flow(img1, img2);
+        //        flow.pair_flow(img1, img2);
 
         // annotate resulting image
         annotated_images.push_back(annotate_img(orig_images[i+1]));	// animate colored second pair
