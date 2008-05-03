@@ -48,7 +48,7 @@ class Flow{
                    IplImage* curr, IplImage* curr_pyr);	// calculate the flow between two images
     
     // Current points tracked
-    CvPoint2D32f *curr_points;
+    CvPoint2D32f *points;
  private:
     // State of machine
     bool ran;				// whether differences have been calculated
