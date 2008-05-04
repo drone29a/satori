@@ -46,5 +46,6 @@ bool save_output = false;                                               // true 
 // prototypes
 void display_program_header();				// display title block
 int display_program_syntax();				// output syntax of program
+void display_program_commands();			// list available commands
 
 #endif

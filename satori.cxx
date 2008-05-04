@@ -116,6 +116,7 @@ int main(int argc, char *argv[]){
     app->run();
   }
   else{	// using webcam
+    display_program_commands();
     app->run_webcam(true);
   }
   
@@ -155,4 +156,10 @@ int display_program_syntax(){
   return 0;
 }
 
-
+void display_program_commands(){
+  cout << endl;
+  cout << "Commands:" << endl;
+  cout << "  " << "f" << ": Start (or restart) flow processing and feature tracking" << endl;
+  cout << "  " << "t" << ": Toggle motion segmentation and object identificaion" << endl;
+  cout << endl;
+}
