@@ -1,14 +1,10 @@
 /*
  * flow.h - Calculate Optical Flows and Differences
- * (c) 2008 Michael Sullivan
+ * (c) 2008 Michael Sullivan and Matt Revelle
  *
- * Version 1.0.0
- * Last Revised: 04/29/08
+ * Last Revised: 05/04/08
  *
- * Version History:
- *  1.0.0 - Primary implementation (04/29/08)
- *
- *  This program utilizes the Open Computer Vision Library (OpenCV)
+ *  This program uses the Open Computer Vision Library (OpenCV)
  *
  */
 
