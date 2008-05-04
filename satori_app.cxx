@@ -94,7 +94,7 @@ int SatoriApp::run_webcam(bool verbose){
 
   cvNamedWindow("Webcam_Capture", 0 );
 
-  IplImage *image = NULL, *prev_grey = NULL, *grey = NULL;
+  IplImage *image = NULL, *prev_grey = NULL, *grey = NULL, *ann_image = NULL;
 
   for(;;){
   
@@ -140,7 +140,9 @@ int SatoriApp::run_webcam(bool verbose){
     CV_SWAP(prev_pyramid, pyramid, swap_temp);
 
     // display webcam output        
-    cvShowImage("Webcam_Capture", annotate(image));
+    ann_image = annotate(image);
+    cvShowImage("Webcam_Capture", ann_image);
+    cvReleaseImage(&ann_image);
 
     // Handle keyboard input
     key_ch = cvWaitKey(10);
