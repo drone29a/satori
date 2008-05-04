@@ -116,15 +116,15 @@ int main(int argc, char *argv[]){
   else{	// using webcam
     app->run_webcam(true);
   }
-        
+  
   // output a video to the proper folder
   if (save_output){
       
       app->animate(out_path.native_directory_string());
   }
-          
+         
   delete app;
-  
+
   return 0;
 }
 

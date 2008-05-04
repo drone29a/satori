@@ -36,12 +36,16 @@ SatoriApp::~SatoriApp(){
     // Destructor
     // release all images
 
-    for(int i = 0; i < orig_images.size(); ++i){
-        cvReleaseImage(&orig_images[i]);
-        cvReleaseImage(&gray_images[i]);
-        cvReleaseImage(&annotated_images[i]);
+    for(int i = 0; i < orig_images.size(); i++){
+        cvReleaseImage(&orig_images[i]);   
     }
- 
+    for(int j = 0; j < gray_images.size(); j++){
+	cvReleaseImage(&gray_images[j]);
+    }
+    for(int k = 0; k < annotated_images.size(); k++){
+	cvReleaseImage(&annotated_images[k]);
+    }
+
     if(prev_pyramid) cvReleaseImage(&prev_pyramid);
     if(pyramid) cvReleaseImage(&pyramid);
 }
@@ -266,14 +270,17 @@ void SatoriApp::animate(string outfolder, bool verbose){
 
 IplImage* SatoriApp::annotate_img(IplImage* img){
 
+    // annotate a copy of the image
+    IplImage* img1 = cvCloneImage(img);
+
     // add circles for each tracked point
     int num_points = flow.point_count();
 
     for(int i = 0; i < num_points; ++i) {
         CvPoint pt = cvPointFrom32f(flow.points[i]);
-        cvCircle(img, pt, 3, CV_RGB(0,255,0), -1, 8, 0);
+        cvCircle(img1, pt, 3, CV_RGB(0,255,0), -1, 8, 0);
     }
     
     // return annotated image
-    return img;
+    return img1;
 }
