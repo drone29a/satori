@@ -8,6 +8,7 @@
 // includes
 #include "common.h"
 #include "flow.h"
+#include "track.h"
 #include "cv.h"
 #include "highgui.h"
 #include <iostream>
@@ -50,8 +51,9 @@ private:
   bool do_flow;
   bool do_track;
   
-  // Flow machine
+  // Components
   Flow flow;
+  Track track;
 
   // Images
   IplImage *swap_temp;

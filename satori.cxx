@@ -18,6 +18,8 @@
  * Code for Boost filesystem code taken from:
  * (1) simple_ls.cpp (available at http://www.boost.org/doc/libs/1_35_0/libs/filesystem/example/simple_ls.cpp)
  *
+ * Code snippets for motion templates from:
+ * (1) motempl.c (available at: http://www.csie.ntu.edu.tw/~r94082/samples/c/motempl.c)
  * All code snippets have been heavily modified for the most recent version of the program.
  *
  */

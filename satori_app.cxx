@@ -128,6 +128,7 @@ int SatoriApp::run_webcam(bool verbose){
 
         if (do_track){
         // track largest moving object
+            track.update(grey);
         }
     
         // prepare for next captured picture
@@ -145,6 +146,9 @@ int SatoriApp::run_webcam(bool verbose){
         {
         case 'f':
             need_flow_init = true;
+            break;
+        case 't':
+            do_trace = true;
             break;
         default:
             ;
