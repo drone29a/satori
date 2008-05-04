@@ -26,19 +26,24 @@ SatoriApp::SatoriApp(){
     // which components should be executed in run loop
     do_flow = false;
     do_track = false;
+
+    // set pyramids to NULL in order to avoid destructor ugliness
+    prev_pyramid = NULL;
+    pyramid = NULL;
 }
 
 SatoriApp::~SatoriApp(){
     // Destructor
     // release all images
+
     for(int i = 0; i < orig_images.size(); ++i){
         cvReleaseImage(&orig_images[i]);
         cvReleaseImage(&gray_images[i]);
         cvReleaseImage(&annotated_images[i]);
     }
-
-    cvReleaseImage(&prev_pyramid);
-    cvReleaseImage(&pyramid);
+ 
+    if(prev_pyramid) cvReleaseImage(&prev_pyramid);
+    if(pyramid) cvReleaseImage(&pyramid);
 }
 
 // Access Functions
@@ -155,7 +160,7 @@ int SatoriApp::run(bool verbose){
 
     if(orig_images.size() == 0){
         cout << "  * " << "No images to process!" << endl;
-        return 0;
+        return NO_IMAGES;
     }
 
     if(verbose)

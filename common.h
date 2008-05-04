@@ -6,5 +6,6 @@ const int MAX_POINTS_TO_TRACK = 500;	// maximum number of points to track
 const int WINDOW_SIZE = 5;	// size of neighborhood about a pixel to determine corners
 
 #define IMAGE_CONSISTENCY_FAILED -1;
+#define NO_IMAGES -2;
 
 #endif
