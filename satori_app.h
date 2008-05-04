@@ -62,7 +62,9 @@ private:
   IplImage *prev_pyramid, *pyramid;
 
   // Action Functions
-  IplImage* annotate_img(IplImage*);
+  IplImage* annotate(IplImage*); // returns an annotated copy
+  IplImage* annotate_flow(IplImage*); // returns same image with annotation
+  IplImage* annotate_track(IplImage*); // returns same image with annotation
 };
 
 #endif

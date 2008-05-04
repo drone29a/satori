@@ -140,7 +140,7 @@ int SatoriApp::run_webcam(bool verbose){
     CV_SWAP(prev_pyramid, pyramid, swap_temp);
 
     // display webcam output        
-    cvShowImage("Webcam_Capture", annotate_img(image));
+    cvShowImage("Webcam_Capture", annotate(image));
 
     // Handle keyboard input
     key_ch = cvWaitKey(10);
@@ -152,7 +152,7 @@ int SatoriApp::run_webcam(bool verbose){
         need_flow_init = true;
         break;
       case 't':
-        do_track = true;
+        do_track = !do_track;
         break;
       default:
         ;
@@ -219,7 +219,7 @@ int SatoriApp::run(bool verbose){
     //        flow.pair_flow(img1, img2);
 
     // annotate resulting image
-    annotated_images.push_back(annotate_img(orig_images[i+1]));	// animate colored second pair
+    annotated_images.push_back(annotate(orig_images[i+1]));	// animate colored second pair
 
     if(verbose)
       cout << "\t\t\t\t[OK]" << endl;
@@ -272,19 +272,49 @@ void SatoriApp::animate(string outfolder, bool verbose){
   }
 }
 
-IplImage* SatoriApp::annotate_img(IplImage* img){
-    
+IplImage* SatoriApp::annotate(IplImage* img){
   // annotate a copy of the image
-  IplImage* img1 = cvCloneImage(img);
+  IplImage* ann = cvCloneImage(img);
+
+  if (do_flow){
+    ann = annotate_flow(ann);
+  }
   
+  if (do_track){
+    ann = annotate_track(ann);
+  }
+  
+  return ann;
+}
+    
+IplImage* SatoriApp::annotate_flow(IplImage* img){
   // add circles for each tracked point
   int num_points = flow.point_count();
 
   for(int i = 0; i < num_points; ++i) {
     CvPoint pt = cvPointFrom32f(flow.points[i]);
-    cvCircle(img1, pt, 3, CV_RGB(0,255,0), -1, 8, 0);
+    cvCircle(img, pt, 3, CV_RGB(0,255,0), -1, 8, 0);
   }
   
-  // return annotated image
-  return img1;
+  return img;
+}
+
+IplImage* SatoriApp::annotate_track(IplImage* img){
+  // add boxes for each motion segment
+  CvSeq *segs = track.segments();
+  CvRect comp_rect;
+  CvScalar color;
+
+  for(int i = 0; i < segs->total; ++i){
+    comp_rect = (reinterpret_cast<CvConnectedComp*>(cvGetSeqElem(segs, i)))->rect;
+    color = CV_RGB(255, 0, 0);
+    
+    cvRectangle(img, 
+                cvPoint(comp_rect.x, comp_rect.y),
+                cvPoint(comp_rect.x + comp_rect.width,
+                        comp_rect.y + comp_rect.height),
+                color);
+  }
+
+  return img;
 }

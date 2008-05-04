@@ -28,7 +28,8 @@ class Track{
   Track();
   ~Track();
 
-  void update(IplImage* img);        
+  void update(IplImage* img); // update the motion segments        
+  CvSeq* segments(); // return found motion segments
 
  private:
   IplImage **buf;
