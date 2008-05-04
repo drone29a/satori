@@ -160,7 +160,8 @@ int display_program_syntax(){
 void display_program_commands(){
   cout << endl;
   cout << "Commands:" << endl;
-  cout << "  " << "f" << ": Start (or restart) flow processing and feature tracking" << endl;
+  cout << "  " << "f" << ": Toggle flow processing and feature tracking" << endl;
   cout << "  " << "t" << ": Toggle motion segmentation and object identificaion" << endl;
+  cout << "  " << "r" << ": Find and track a moving object" << endl;
   cout << endl;
 }

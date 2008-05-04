@@ -142,4 +142,9 @@ const CvBox2D& Track::track_box() const{
 }
 
 void Track::select_window(CvRect& rect){
+  
+}
+
+void Track::reset(){
+  need_camshift_init = true;
 }

@@ -39,6 +39,7 @@ class Track{
   ~Track();
   
   void update(IplImage*); // update the motion segments        
+  void reset(); // reset object to track
   CvSeq* segments(); // return found motion segments
   const CvBox2D& track_box() const; // return ref to tracked area
 

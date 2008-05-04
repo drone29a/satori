@@ -116,14 +116,6 @@ int SatoriApp::run_webcam(bool verbose){
     cvCopy(frame, image, 0);
     cvCvtColor(image, grey, CV_BGR2GRAY);
 
-    // In case new features should be found
-    if (need_flow_init){
-      flow.init(grey);
-
-      need_flow_init = false;
-      do_flow = true;
-    }
-
     // perform operations
     if (do_flow && flow.point_count() > 0){
       // update pairs with flow information
@@ -151,10 +143,14 @@ int SatoriApp::run_webcam(bool verbose){
     switch( (char) key_ch )
       {
       case 'f':
-        need_flow_init = true;
+        flow.init(grey);
+        do_flow = !do_flow;
         break;
       case 't':
         do_track = !do_track;
+        break;
+      case 'r':
+        track.reset();
         break;
       default:
         ;
