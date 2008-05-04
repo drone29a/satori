@@ -64,3 +64,7 @@ void Track::update(IplImage *img){
 
   segs = cvSegmentMotion(mhi, segmask, storage, timestamp, MAX_TIME_DELTA);
 }
+
+CvSeq* Track::segments(){
+  return segs;
+}
