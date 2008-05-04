@@ -32,8 +32,8 @@ POUT = satori
 #
 
 # build program
-all: satori.o flow.o satori_app.o
-	$(CC) $(CFLAGS) $(OPENCVL) $(BOOSTFSL) satori.o satori_app.o flow.o -o $(POUT)
+all: satori.o satori_app.o flow.o track.o
+	$(CC) $(CFLAGS) $(OPENCVL) $(BOOSTFSL) satori.o satori_app.o flow.o track.o -o $(POUT)
 
 # compile program
 satori.o: satori.cxx satori.h
@@ -46,6 +46,10 @@ satori_app.o: satori_app.cxx satori_app.h
 # compile flow component of program
 flow.o: flow.cxx flow.h img_template.tpl
 	$(CC) -c $(DFLAGS) $(OPENCVI) $(OPTI) flow.cxx
+
+# compile track component of program
+track.o: track.cxx track.h img_template.tpl
+	$(CC) -c $(DFLAGS) $(OPENCVI) $(OPTI) track.cxx
 
 # clean products of compile and build
 clean:
