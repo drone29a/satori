@@ -15,6 +15,7 @@
  *
  * Code snippets for motion templates from:
  * (1) motempl.c (available at: http://www.csie.ntu.edu.tw/~r94082/samples/c/motempl.c)
+ * (2) camshiftdemo.c (available at: http://www.csie.ntu.edu.tw/~r94082/samples/c/camshiftdemo.c)
  * All code snippets have been heavily modified for the most recent version of the program.
  *
  * This program uses getopt.h for option parsing, the Boost filesystem 
