@@ -1,13 +1,8 @@
 /*
  * satori.cxx - Executable Image Flow Analysis Application
- * (c) 2008 Michael Sullivan
+ * (c) 2008 Michael Sullivan and Matt Revelle
  *
- * Version 1.0.1
- * Last Revised: 04/29/08
- *
- * Version History:
- *   1.0.1 - Made object oriented and incorporated getopt.h for option parsing (04/29/08)
- *   1.0.0 - Initial "simple image flow example" (04/22/08)
+ * Last Revised: 05/04/08
  *
  * Code snippets for original "simple image flow example" taken from:
  * (1) lkdemo.c (available at: http://www.csie.ntu.edu.tw/~r94082/samples/c/lkdemo.c)
@@ -20,6 +15,9 @@
  *
  * All code snippets have been heavily modified for the most recent version of the program.
  *
+ * This program uses getopt.h for option parsing, the Boost filesystem 
+ * library, and the Open Computer Vision Library (OpenCV)
+ *
  */
 
 #include "satori.h"	// program header
@@ -31,7 +29,7 @@ int main(int argc, char *argv[]){
   int optchar;							// for option input
 
   // handle input flags
-  while((optchar = getopt(argc, argv, "i:f:s?o:w")) != -1){	// read in arguments
+  while((optchar = getopt(argc, argv, "i:f:s?o:w:")) != -1){	// read in arguments
     switch(optchar){
       case 'i':			// input directory
         input_directory = new string(optarg);
@@ -140,12 +138,13 @@ void display_program_header(){
 
 int display_program_syntax(){
   cout << endl;
-  cout << PROGRAM_NAME << ": Approximate a third dimension from images using optical flow." << endl;
+  cout << PROGRAM_NAME << ": Visually track a moving object without user input using optical flow and color-based motion segmentation." << endl;
   cout << endl;
 
-  cout << "Syntax: " << PROGRAM_NAME << " -i (directory) [-f (file format) -s -v]" << endl;
+  cout << "Syntax: " << PROGRAM_NAME << " -w (device) OR -i (directory) [-f (file format) -s -v]" << endl;
+  cout << "  " << "-w" << ": Process input from an attached webcam (located at /dev/video0)" << endl;
   cout << "  " << "-i (directory)" << ": Process all image files from the given directory (default \"" << DEFAULT_INPUT_DIRECTORY << "/\")" << endl;
-  cout << "  " << "-f (file format)" << ": Read any images with the given file extension (default *." << DEFAULT_FILE_FORMAT << ")" << endl;
+  cout << "  " << "-f (file format)" << ": Read any images with the given file extension (default *" << DEFAULT_FILE_FORMAT << ")" << endl;
   cout << "  " << "-s" << ": Disable program output" << endl;
   cout << "  " << "-?" << ": Display this screen" << endl;
   cout << endl;

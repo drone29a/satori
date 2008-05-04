@@ -1,21 +1,11 @@
 /*
  * satori.h - Header for Image Flow Analysis Application
- * (c) 2008 Michael Sullivan
+ * (c) 2008 Michael Sullivan and Matt Revelle
  *
- * Version 1.0.1
- * Last Revised: 04/29/08
+ * Last Revised: 05/04/08
  *
- * Version History:
- *   1.0.1 - Made object oriented and incorporated getopt.h for option parsing (04/29/08)
- *   1.0.0 - Initial "simple image flow example" (04/22/08)
- *
- * Code snippets for imflow taken from:
- * (1) lkdemo.c (available at: http://www.csie.ntu.edu.tw/~r94082/samples/c/lkdemo.c)
- * (2) Gady Agam's Introduction to programming with OpenCV (available at: http://www.cs.iit.edu/~agam/cs512/lect-notes/opencv-intro/opencv-intro.html#SECTION00025000000000000000)
- * (3) ymazari@yahoo.fr (available at: http://groups.google.ws/group/OpenCV/msg/ec125224a1123fc2)
- * (4) cegparamesh@gmail.com (available at: http://opencvlibrary.sourceforge.net/DisplayManyImages)
- *
- * This program utilizes the Boost.Filesystem library
+ * This program uses getopt.h for option parsing, the Boost filesystem 
+ * library, and the Open Computer Vision Library (OpenCV)
  *
  */
 
