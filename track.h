@@ -59,7 +59,6 @@ class Track{
   CvBox2D _track_box;
   CvConnectedComp track_comp;
   int hdims;
-  float* hranges;
   int vmin, vmax, smin;
   bool track_object;
   CvRect track_window;

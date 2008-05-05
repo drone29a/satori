@@ -28,8 +28,6 @@ Track::Track(){
   vmin = 10;
   vmax = 256;
   smin = 30;
-  float hranges_arr[] = {0, 180};
-  hranges = hranges_arr;
 }
 
 Track::~Track(){
@@ -97,7 +95,9 @@ void Track::update_camshift(IplImage *img){
     hue = cvCreateImage(cvGetSize(img), 8, 1);
     mask = cvCreateImage(cvGetSize(img), 8, 1);
     backproject = cvCreateImage(cvGetSize(img), 8, 1);
-    hist = cvCreateHist(1, &hdims, CV_HIST_ARRAY, &hranges, 1);
+    float range[] = {0, 180};
+    float *ranges = range;
+    hist = cvCreateHist(1, &hdims, CV_HIST_ARRAY, &ranges, 1);
   }
 
   cvCvtColor(img, hsv, CV_BGR2HSV);
@@ -105,12 +105,8 @@ void Track::update_camshift(IplImage *img){
   if (track_object){
     int _vmin = vmin, _vmax = vmax;
 
-    cvInRangeS(hsv, cvScalar(0,smin,MIN(_vmin,_vmax),0),
-                cvScalar(180,256,MAX(_vmin,_vmax),0), mask);
-    cvSplit(hsv, hue, 0, 0, 0);
-
-    cvInRangeS(hsv, cvScalar(0, smin, MIN(vmin, vmax), 0),
-               cvScalar(180, 256, MAX(vmin, vmax), 0), mask);
+    cvInRangeS(hsv, cvScalar(0, smin, MIN(_vmin,_vmax), 0),
+                cvScalar(180, 256, MAX(_vmin, _vmax), 0), mask);
     cvSplit(hsv, hue, 0, 0, 0);
 
     cvCalcBackProject(&hue, backproject, hist);
