@@ -314,5 +314,10 @@ IplImage* SatoriApp::annotate_track(IplImage* img){
                 color);
   }
 
+  const CvBox2D& track_box = track.track_box();
+  cout << track_box.center.x << "  " << track_box.center.y << "  "
+       << track_box.size.width << "  " << track_box.size.height << endl;
+  cvEllipseBox(img, track_box, CV_RGB(0,0,255), 3, CV_AA, 0);
+
   return img;
 }

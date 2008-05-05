@@ -23,7 +23,6 @@ Track::Track(){
 
   // init for camshift
   track_object = false;
-  need_camshift_init = true;
   hsv = NULL;
   hdims = 16;
   vmin = 10;
@@ -104,22 +103,15 @@ void Track::update_camshift(IplImage *img){
   cvCvtColor(img, hsv, CV_BGR2HSV);
 
   if (track_object){
+    int _vmin = vmin, _vmax = vmax;
+
+    cvInRangeS(hsv, cvScalar(0,smin,MIN(_vmin,_vmax),0),
+                cvScalar(180,256,MAX(_vmin,_vmax),0), mask);
+    cvSplit(hsv, hue, 0, 0, 0);
+
     cvInRangeS(hsv, cvScalar(0, smin, MIN(vmin, vmax), 0),
                cvScalar(180, 256, MAX(vmin, vmax), 0), mask);
     cvSplit(hsv, hue, 0, 0, 0);
-
-    // pick a start window and init with it, if none is set
-    if (need_camshift_init){
-      float max_val = 0.f;
-      select_window(track_window);
-      cvSetImageROI(hue, track_window);
-      cvSetImageROI(mask, track_window);
-      cvCalcHist(&hue, hist, 0, mask);
-      cvGetMinMaxHistValue(hist, 0, &max_val, 0, 0);
-      cvConvertScale(hist->bins, hist->bins, max_val ? 255.0 / max_val : 0.0, 0);
-      cvResetImageROI(hue);
-      cvResetImageROI(mask);
-    }
 
     cvCalcBackProject(&hue, backproject, hist);
     cvAnd(backproject, mask, backproject, 0);
@@ -142,9 +134,32 @@ const CvBox2D& Track::track_box() const{
 }
 
 void Track::select_window(CvRect& rect){
-  
+  CvRect comp_rect = (reinterpret_cast<CvConnectedComp*>(cvGetSeqElem(segs, 0)))->rect;
+  rect = comp_rect;
 }
 
 void Track::reset(){
-  need_camshift_init = true;
+  init_camshift();
+  track_object = true;
+}
+
+void Track::init_camshift(){
+  int _vmin = vmin, _vmax = vmax;
+  cvInRangeS( hsv, cvScalar(0,smin,MIN(_vmin, _vmax),0),
+              cvScalar(180,256,MAX(_vmin, _vmax),0), mask );
+  cvSplit( hsv, hue, 0, 0, 0 );
+  
+  float max_val = 0.f;
+  select_window(track_window);
+  cvSetImageROI(hue, track_window);
+  cvSetImageROI(mask, track_window);
+  cvCalcHist(&hue, hist, 0, mask);
+  cvGetMinMaxHistValue(hist, 0, &max_val, 0, 0);
+  cvConvertScale(hist->bins, hist->bins, max_val ? 255.0 / max_val : 0.0, 0);
+  cvResetImageROI(hue);
+  cvResetImageROI(mask);
+  
+  cout << "track_window: "
+       << track_window.x << "  " << track_window.y << "  " 
+       << track_window.width << "  " << track_window.height << endl;
 }

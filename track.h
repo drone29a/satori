@@ -62,13 +62,13 @@ class Track{
   float* hranges;
   int vmin, vmax, smin;
   bool track_object;
-  bool need_camshift_init;
   CvRect track_window;
 
   // methods
   void update_motion_segments(IplImage*);
   void update_camshift(IplImage*);
   void select_window(CvRect&); // find the best start window
+  void init_camshift();
 };
 
 #endif
