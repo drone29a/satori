@@ -1,0 +1,7 @@
+TODO
+
+- decide how to approximate the best motion segment region to use as 
+  the start window for CAMSHIFT
+- assuming that feature points were used to choose the start window, 
+  keep checking that the CAMSHIFT box contains a good percentage of the points, 
+  otherwise may need to reset the track window
