@@ -41,6 +41,7 @@ class Track{
   void update(IplImage*); // update the motion segments        
   void reset(); // reset object to track
   CvSeq* segments(); // return found motion segments
+  const CvConnectedComp* largest_segment();
   const CvBox2D& track_box() const; // return ref to tracked area
 
  private:
@@ -52,6 +53,7 @@ class Track{
   IplImage *segmask; // motion segmentation map
   CvMemStorage* storage; // temp storage
   CvSeq *segs;
+  bool segs_sorted;
 
   // variables for camshift
   IplImage *hsv, *hue, *backproject, *mask;

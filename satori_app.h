@@ -9,6 +9,7 @@
 #include "common.h"
 #include "flow.h"
 #include "track.h"
+#include "focus.h"
 #include "cv.h"
 #include "highgui.h"
 #include <iostream>
@@ -54,6 +55,7 @@ private:
   // Components
   Flow flow;
   Track track;
+  Focus focus;
 
   // Images
   IplImage *swap_temp;

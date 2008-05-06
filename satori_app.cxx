@@ -125,6 +125,12 @@ int SatoriApp::run_webcam(bool verbose){
     if (do_track){
       // track largest moving object
       track.update(image);
+      bool changed = false;
+      focus.update(&track.track_box(), 
+                   track.largest_segment(), 
+                   flow.points, 
+                   cvGetSize(image),
+                   changed);
     }
     
     // prepare for next captured picture

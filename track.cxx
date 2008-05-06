@@ -1,5 +1,5 @@
 /*
- * track.cxx - Implementation of Track functions
+ * track.cxx - Implementation of Track class
  * (c) 2008 Michael Sullivan and Matt Revelle
  *
  * Last Revised: 05/04/08
@@ -20,6 +20,7 @@ Track::Track(){
   // init for motion segmentation
   last = 0;
   diff_threshold = 30;
+  segs_sorted = false;
 
   // init for camshift
   track_object = false;
@@ -87,6 +88,8 @@ void Track::update_motion_segments(IplImage *img){
   }
 
   segs = cvSegmentMotion(mhi, segmask, storage, timestamp, MAX_TIME_DELTA);
+
+  segs_sorted = false;
 }
 
 void Track::update_camshift(IplImage *img){
@@ -124,6 +127,23 @@ void Track::update_camshift(IplImage *img){
 CvSeq* Track::segments(){
   return segs;
 }
+
+static int larger_area(const void* _a, const void* _b, void* extra){
+  CvConnectedComp* a = (CvConnectedComp*)_a;
+  CvConnectedComp* b = (CvConnectedComp*)_b;
+  int diff = a->area - b->area;
+  return diff;
+}
+
+const CvConnectedComp* Track::largest_segment(){
+  if (!segs_sorted) {
+    cvSeqSort(segs, larger_area, 0);
+    segs_sorted = true;
+  }
+
+  return reinterpret_cast<CvConnectedComp*>(cvGetSeqElem(segs, 0));
+}
+
 
 const CvBox2D& Track::track_box() const{
   return _track_box;
