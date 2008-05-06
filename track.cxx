@@ -131,7 +131,7 @@ CvSeq* Track::segments(){
 static int larger_area(const void* _a, const void* _b, void* extra){
   CvConnectedComp* a = (CvConnectedComp*)_a;
   CvConnectedComp* b = (CvConnectedComp*)_b;
-  int diff = a->area - b->area;
+  int diff = b->area - a->area;
   return diff;
 }
 
@@ -150,7 +150,7 @@ const CvBox2D& Track::track_box() const{
 }
 
 void Track::select_window(CvRect& rect){
-  CvRect comp_rect = (reinterpret_cast<CvConnectedComp*>(cvGetSeqElem(segs, 0)))->rect;
+  CvRect comp_rect = largest_segment()->rect;
   rect = comp_rect;
 }
 
@@ -161,9 +161,9 @@ void Track::reset(){
 
 void Track::init_camshift(){
   int _vmin = vmin, _vmax = vmax;
-  cvInRangeS( hsv, cvScalar(0,smin,MIN(_vmin, _vmax),0),
-              cvScalar(180,256,MAX(_vmin, _vmax),0), mask );
-  cvSplit( hsv, hue, 0, 0, 0 );
+  cvInRangeS(hsv, cvScalar(0,smin,MIN(_vmin, _vmax),0),
+              cvScalar(180,256,MAX(_vmin, _vmax),0), mask);
+  cvSplit(hsv, hue, 0, 0, 0);
   
   float max_val = 0.f;
   select_window(track_window);
