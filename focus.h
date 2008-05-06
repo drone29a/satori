@@ -48,6 +48,7 @@ class Focus{
   void update(const CvBox2D* track_box, 
               const CvConnectedComp* motion_area,
               CvPoint2D32f* feature_points,
+              int num_points,
               const CvSize& frame_size_, // size of frames
               bool& changed=false); // check if focus change is needed
 
@@ -62,8 +63,8 @@ class Focus{
   CvSize frame_size; // gets updated by calls to update
 
   // methods
-  float density(CvBox2D, CvPoint2D32f*, int);
-  float density(CvConnectedComp, CvPoint2D32f*, int);
+  float density(const CvBox2D*, CvPoint2D32f*, int);
+  float density(const CvConnectedComp*, CvPoint2D32f*, int);
   int intersect_count(CvPoint*, int, CvPoint2D32f*, int);
 };
 

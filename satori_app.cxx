@@ -129,6 +129,7 @@ int SatoriApp::run_webcam(bool verbose){
       focus.update(&track.track_box(), 
                    track.largest_segment(), 
                    flow.points, 
+                   flow.point_count(),
                    cvGetSize(image),
                    changed);
     }

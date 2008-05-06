@@ -21,27 +21,40 @@ Focus::~Focus(){
 }
 
 void Focus::update(const CvBox2D* track_box, 
-                   const CvConnectedComp* motion_area,
+                   const CvConnectedComp* motion_seg,
                    CvPoint2D32f* feature_points,
+                   int num_points,
                    const CvSize& frame_size_,
                    bool& changed){
+  frame_size = frame_size_;
+  changed = false;
+
   if (!poly_img) {
     poly_img = cvCreateImage(frame_size, 8, 1);
     point_img = cvCreateImage(frame_size, 8, 1);
     and_img = cvCreateImage(frame_size, 8, 1);
   }
 
-  frame_size = frame_size_;
-  changed = false;
+  // Check if CAMSHIFT box and motion segment largely intersect
+
+  // Calculate feature density for both CAMSHIFTed box and motion segment
+  float cam_density = density(track_box, feature_points, num_points);
+  float seg_density = density(motion_seg, feature_points, num_points);
+  float density_ratio = seg_density / cam_density;
+  
+  // If density is significantly higher in motion_seg, change focus
+  if (density_ratio > 1.5) {
+    changed = true;
+  }
 }
 
 const CvConnectedComp& Focus::focus_area(){
   return last_focus_area;
 }
 
-float Focus::density(CvBox2D box, CvPoint2D32f* pts, int num_pts){
+float Focus::density(const CvBox2D* box, CvPoint2D32f* pts, int num_pts){
   CvPoint2D32f v_float[4];
-  cvBoxPoints(box, v_float);
+  cvBoxPoints(*box, v_float);
 
   CvPoint v[4];
   for (int i = 0; i < 4; ++i){
@@ -50,18 +63,18 @@ float Focus::density(CvBox2D box, CvPoint2D32f* pts, int num_pts){
   
   float count = (float)intersect_count(v, 4, pts, num_pts);
 
-  return count / (float)(box.size.width * box.size.height);
+  return count / (float)(box->size.width * box->size.height);
 }
 
-float Focus::density(CvConnectedComp comp, CvPoint2D32f* pts, int num_pts){
+float Focus::density(const CvConnectedComp* comp, CvPoint2D32f* pts, int num_pts){
   CvPoint v[4];
-  v[0] = cvPoint(comp.rect.x, comp.rect.y);
-  v[1] = cvPoint(comp.rect.x + comp.rect.width, comp.rect.y);
-  v[2] = cvPoint(comp.rect.x + comp.rect.width, comp.rect.y - comp.rect.height);
-  v[3] = cvPoint(comp.rect.x, comp.rect.y - comp.rect.height);
+  v[0] = cvPoint(comp->rect.x, comp->rect.y);
+  v[1] = cvPoint(comp->rect.x + comp->rect.width, comp->rect.y);
+  v[2] = cvPoint(comp->rect.x + comp->rect.width, comp->rect.y - comp->rect.height);
+  v[3] = cvPoint(comp->rect.x, comp->rect.y - comp->rect.height);
   
   float count = (float)intersect_count(v, 4, pts, num_pts);
-  return count / (float)(comp.rect.width * comp.rect.height);
+  return count / (float)(comp->rect.width * comp->rect.height);
 }
 
 int Focus::intersect_count(CvPoint* verts, int num_verts, 
