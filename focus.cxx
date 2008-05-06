@@ -37,14 +37,17 @@ void Focus::update(const CvBox2D* track_box,
 
   // Check if CAMSHIFT box and motion segment largely intersect
 
-  // Calculate feature density for both CAMSHIFTed box and motion segment
-  float cam_density = density(track_box, feature_points, num_points);
-  float seg_density = density(motion_seg, feature_points, num_points);
-  float density_ratio = seg_density / cam_density;
+  if (track_box && motion_seg && feature_points){
+
+    // Calculate feature density for both CAMSHIFTed box and motion segment
+    float cam_density = density(track_box, feature_points, num_points);
+    float seg_density = density(motion_seg, feature_points, num_points);
+    float density_ratio = seg_density / cam_density;
   
-  // If density is significantly higher in motion_seg, change focus
-  if (density_ratio > 1.5) {
-    changed = true;
+    // If density is significantly higher in motion_seg, change focus
+    if (density_ratio > 1.5) {
+      changed = true;
+    }
   }
 }
 
