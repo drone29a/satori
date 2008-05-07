@@ -212,7 +212,13 @@ void Track::reset(){
 }
 
 void Track::reset(Flow& flow){
-  select_window(track_window, flow);
+  if (flow.point_count() > 0){
+    select_window(track_window, flow);
+  }
+  else{
+    select_window(track_window);
+  }
+
   init_camshift();
 }
 

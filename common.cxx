@@ -29,14 +29,18 @@ void intersect_amount(IplImage* x, IplImage* y, IplImage* dst,
   // intersection.
   IplImage* tmp = cvCreateImage(cvGetSize(dst), 8, 1);
 
+  cvZero(dst);
   cvAnd(x, y, dst);
 
   CvRect db = cvBoundingRect(dst);
   CvRect xb = cvBoundingRect(x);
   CvRect yb = cvBoundingRect(y);
 
+  cvZero(tmp);
   cvAnd(x, dst, tmp);
   CvRect xib = cvBoundingRect(tmp);
+  cout << "xb: " << xb.x << " " << xb.y << " " << xb.width << " " << xb.height << endl;
+  cout << "xib: " << xib.x << " " << xib.y << " " << xib.width << " " << xib.height << endl;
 
   cvZero(tmp);
   cvAnd(y, dst, tmp);
@@ -52,6 +56,11 @@ void intersect_amount(IplImage* x, IplImage* y, IplImage* dst,
   area = (float)(db.width * db.height);
   x_amt = ((float)xib.width*xib.height) / ((float)xb.width*xb.height);
   y_amt = ((float)yib.width*yib.height) / ((float)yb.width*yb.height);
+}
 
-  cout << x_amt << " " << y_amt << endl;
+void rect_to_points(const CvRect& rect, CvPoint points[]){
+  points[0] = cvPoint(rect.x, rect.y);
+  points[1] = cvPoint(rect.x+rect.width, rect.y);
+  points[2] = cvPoint(rect.x+rect.width, rect.y+rect.height);
+  points[3] = cvPoint(rect.x, rect.y+rect.height);
 }

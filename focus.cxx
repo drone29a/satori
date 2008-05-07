@@ -25,6 +25,7 @@ void Focus::update(const CvBox2D* track_box,
                    CvPoint2D32f* feature_points,
                    int num_points,
                    const CvSize& frame_size_,
+                   const bool& points_decide,
                    bool& changed){
   frame_size = frame_size_;
   changed = false;
@@ -36,30 +37,59 @@ void Focus::update(const CvBox2D* track_box,
   }
 
   if (track_box && motion_seg && feature_points){
+    cvZero(poly_img);
+    cvZero(point_img);
+    cvZero(and_img);
 
     // Check if CAMSHIFT box and motion segment largely intersect
     draw_box(track_box, poly_img, cvScalar(255));
     draw_comp(motion_seg, point_img, cvScalar(255));
-    float area = 0.f, cam_amt = 0.f, seg_amt = 0.f;
+    float intersect_area = 0.f, cam_amt = 0.f, seg_amt = 0.f;
+    float frame_area = FRAME_SIZE.width * FRAME_SIZE.height;
     intersect_amount(point_img, poly_img, and_img,
-                     area, cam_amt, seg_amt);
-    CvRect camshift_rect = cvBoundingRect(poly_img);
+                     intersect_area, seg_amt, cam_amt);
+    //    CvRect camshift_rect = cvBoundingRect(poly_img);
     CvRect seg_rect = cvBoundingRect(point_img);
-    float cam_seg_size_ratio = camshift_rect.width*camshift_rect.height / seg_rect.width*seg_rect.height;
-    float cam_frame_size_ratio = (float)(camshift_rect.width*camshift_rect.height) / (float)(FRAME_SIZE.width*FRAME_SIZE.height);
+    float cam_seg_size_ratio = (float)(track_box->size.width*track_box->size.height) / float(seg_rect.width*seg_rect.height);
+    float cam_frame_size_ratio = (float)(track_box->size.width*track_box->size.height) / (float)(FRAME_SIZE.width*FRAME_SIZE.height);
+    float seg_frame_size_ratio = (float)(seg_rect.width*seg_rect.height) / (float)(FRAME_SIZE.width*FRAME_SIZE.height);
+
+    // Number of points intersected in segment vs camshift window
+    CvPoint seg_pts[4];
+    rect_to_points(seg_rect, seg_pts);
+    int seg_point_count = intersect_count(seg_pts, 4, feature_points, num_points);
+    int cam_point_count = intersect_count(track_box, feature_points, num_points);
+    float seg_cam_point_count_ratio = (float)seg_point_count / (float)cam_point_count;
     
     // Calculate feature density for both CAMSHIFTed box and motion segment
     float cam_density = density(track_box, feature_points, num_points);
     float seg_density = density(motion_seg, feature_points, num_points);
     float seg_cam_density_ratio = seg_density / cam_density;
-  
+
+    cout << intersect_area << " " << cam_frame_size_ratio << " " << cam_amt << " " << seg_amt << endl;
+
     // Decide whether to change focus
-    if (//(seg_cam_density_ratio > 1.08f || seg_cam_point_count_ratio > 0.7) && 
-        cam_frame_size_ratio > 0.4f && 
-        (seg_amt < 0.65f || cam_amt < 0.65f)) {
-      changed = true;
+    if (points_decide){
+          if ((seg_cam_density_ratio > 1.08f || seg_cam_point_count_ratio > 0.6f) && 
+              cam_frame_size_ratio > 0.6f && 
+              (seg_amt < 0.5f || cam_amt < 0.5f)) {
+            changed = true;
+          }
     }
-        
+    else{
+      if ((seg_amt < 0.15f && 
+           seg_frame_size_ratio > 0.02f) ||
+          (intersect_area > frame_area * 0.01f && 
+           cam_frame_size_ratio > 0.3f && 
+           cam_amt < 0.55f)) {
+        changed = true;
+        if (seg_amt < 0.15f && seg_frame_size_ratio > 0.02f){
+        }
+        else {
+        }
+      }
+    }
+    /*
     cout << "density ";
     
     if (seg_cam_density_ratio > 1.08f){
@@ -72,7 +102,7 @@ void Focus::update(const CvBox2D* track_box,
     cout << " | ";
     cout << "size ";
 
-    if (cam_frame_size_ratio > 0.4f){
+    if (cam_frame_size_ratio > 0.6f){
       cout << "CHANGE";
     }
     else{
@@ -82,7 +112,7 @@ void Focus::update(const CvBox2D* track_box,
     cout << " | ";
     cout << "segment intersect ";
 
-    if (seg_amt < 0.65f){
+    if (seg_amt < 0.5f){
       cout << "CHANGE";
     }
     else{
@@ -92,12 +122,13 @@ void Focus::update(const CvBox2D* track_box,
     cout << " | ";
     cout << "camshift intersect ";
 
-    if (cam_amt < 0.65f){
+    if (cam_amt < 0.5f){
       cout << "CHANGE" << endl;
     }
     else{
       cout << "STAY" << endl;
     }
+    */
   }
 }
 
@@ -138,6 +169,24 @@ int Focus::intersect_count(CvPoint* verts, int num_verts,
   
   // Draw polygon
   cvFillConvexPoly(poly_img, verts, num_verts, cvScalar(255));
+  
+  // Draw points
+  draw_points(pts, num_pts, point_img, cvScalar(255));
+  
+  cvAnd(poly_img, point_img, and_img);
+
+  int count = cvCountNonZero(and_img);
+
+  return count;
+}
+
+int Focus::intersect_count(const CvBox2D* box, CvPoint2D32f* pts, int num_pts){
+  cvZero(poly_img);
+  cvZero(point_img);
+  cvZero(and_img);
+  
+  // Draw polygon
+  draw_box(box, poly_img, cvScalar(255));
   
   // Draw points
   draw_points(pts, num_pts, point_img, cvScalar(255));

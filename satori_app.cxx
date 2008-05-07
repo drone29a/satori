@@ -101,6 +101,7 @@ int SatoriApp::run_webcam(bool verbose){
 
   IplImage *image = NULL, *prev_grey = NULL, *grey = NULL, *ann_image = NULL;
   bool changed = false;
+  bool points_decide = false;
 
   for(;;){
   
@@ -137,10 +138,19 @@ int SatoriApp::run_webcam(bool verbose){
                    flow.points, 
                    flow.point_count(),
                    cvGetSize(image),
+                   points_decide,
                    changed);
       
       if (changed){
-        track.reset(flow);
+        int intersect_count = focus.intersect_count(&track.track_box(), 
+                                                    flow.points, 
+                                                    flow.point_count());
+        if (intersect_count > 0){
+          track.reset(flow);
+        }
+        else{
+          track.reset();
+        }
       }
     }
     
@@ -168,6 +178,9 @@ int SatoriApp::run_webcam(bool verbose){
         break;
       case 'r':
         track.reset(flow);
+        break;
+      case 'd':
+        points_decide = !points_decide;
         break;
       default:
         ;

@@ -25,5 +25,6 @@ void draw_comp(const CvConnectedComp*, IplImage*, const CvScalar&);
 void draw_points(CvPoint2D32f*, int, IplImage*, const CvScalar&);
 void intersect_amount(IplImage*, IplImage*, IplImage*, 
                       float&, float&, float&);
+void rect_to_points(const CvRect& rect, CvPoint points[]);
 
 #endif

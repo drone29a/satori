@@ -50,10 +50,13 @@ class Focus{
               CvPoint2D32f* feature_points,
               int num_points,
               const CvSize& frame_size_, // size of frames
+              const bool& density_decide,
               bool& changed=false); // check if focus change is needed
 
   const CvConnectedComp& focus_area(); // the last focus area
-
+  int intersect_count(const CvBox2D*, CvPoint2D32f*, int);
+  int intersect_count(CvPoint*, int, CvPoint2D32f*, int);
+  
  private:
   // variables
   CvConnectedComp last_focus_area;
@@ -65,7 +68,6 @@ class Focus{
   // methods
   float density(const CvBox2D*, CvPoint2D32f*, int);
   float density(const CvConnectedComp*, CvPoint2D32f*, int);
-  int intersect_count(CvPoint*, int, CvPoint2D32f*, int);
 };
 
 #endif
