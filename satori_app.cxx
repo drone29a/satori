@@ -100,6 +100,7 @@ int SatoriApp::run_webcam(bool verbose){
   cvNamedWindow("Webcam_Capture", 0 );
 
   IplImage *image = NULL, *prev_grey = NULL, *grey = NULL, *ann_image = NULL;
+  bool changed = false;
 
   for(;;){
   
@@ -130,13 +131,17 @@ int SatoriApp::run_webcam(bool verbose){
     if (do_track){
       // track largest moving object
       track.update(image);
-      bool changed = false;
+      changed = false;
       focus.update(&track.track_box(), 
                    track.largest_segment(), 
                    flow.points, 
                    flow.point_count(),
                    cvGetSize(image),
                    changed);
+      
+      if (changed){
+        track.reset(flow);
+      }
     }
     
     // prepare for next captured picture
@@ -311,19 +316,26 @@ IplImage* SatoriApp::annotate_flow(IplImage* img){
 
 IplImage* SatoriApp::annotate_track(IplImage* img){
   // add boxes for each motion segment
-  CvSeq *segs = track.segments();
-  CvRect comp_rect;
-  CvScalar color;
 
-  for(int i = 0; i < segs->total; ++i){
-    comp_rect = (reinterpret_cast<CvConnectedComp*>(cvGetSeqElem(segs, i)))->rect;
-    color = CV_RGB(255, 0, 0);
+//   for(int i = 0; i < segs->total; ++i){
+//     comp_rect = (reinterpret_cast<CvConnectedComp*>(cvGetSeqElem(segs, i)))->rect;
+//     color = CV_RGB(255, 0, 0);
     
+//     cvRectangle(img, 
+//                 cvPoint(comp_rect.x, comp_rect.y),
+//                 cvPoint(comp_rect.x + comp_rect.width,
+//                         comp_rect.y + comp_rect.height),
+//                 color);
+//  }
+
+  const CvConnectedComp* comp = track.largest_segment();
+  if (comp){
+    CvRect comp_rect = comp->rect;
     cvRectangle(img, 
                 cvPoint(comp_rect.x, comp_rect.y),
                 cvPoint(comp_rect.x + comp_rect.width,
                         comp_rect.y + comp_rect.height),
-                color);
+                CV_RGB(255,0,0));
   }
 
   const CvBox2D& track_box = track.track_box();

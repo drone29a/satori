@@ -24,11 +24,12 @@ void draw_points(CvPoint2D32f* pts, int num_pts, IplImage* img, const CvScalar& 
 }
 
 float intersect_amount(IplImage* x, IplImage* y, IplImage* dst){
+  // the percentage of intersection is wrt the first image
   cvAnd(x, y, dst);
 
   CvRect db = cvBoundingRect(dst);
   CvRect xb = cvBoundingRect(x);
   CvRect yb = cvBoundingRect(y);
   
-  return (float)(db.width * db.height) / (float)min(xb.width * xb.height, yb.width * yb.height);
+  return (float)(db.width * db.height) / (float)(xb.width * xb.height);
 }
