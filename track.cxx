@@ -29,9 +29,19 @@ Track::Track(){
   vmin = 10;
   vmax = 256;
   smin = 30;
+  tmp1 = cvCreateImage(cvSize(FRAME_WIDTH, FRAME_HEIGHT), 8, 1);
+  tmp2 = cvCreateImage(cvSize(FRAME_WIDTH, FRAME_HEIGHT), 8, 1);
+  tmp3 = cvCreateImage(cvSize(FRAME_WIDTH, FRAME_HEIGHT), 8, 1);
 }
 
-Track::~Track(){
+Track::~Track(){  
+  cvReleaseImage(&hsv);
+  cvReleaseImage(&hue);
+  cvReleaseImage(&backproject);
+  cvReleaseImage(&mask);
+  cvReleaseImage(&tmp1);
+  cvReleaseImage(&tmp2);
+  cvReleaseImage(&tmp3);
 }
 
 void Track::update(IplImage *img){
@@ -154,9 +164,38 @@ void Track::select_window(CvRect& rect){
   rect = comp_rect;
 }
 
+void Track::select_window(CvRect& rect, Flow& flow){
+  cvZero(tmp1);
+  cvZero(tmp2);
+  cvZero(tmp3);
+
+  const CvConnectedComp* comp = largest_segment();
+  cvRectangle(tmp1, 
+              cvPoint(comp->rect.x, comp->rect.y),
+              cvPoint(comp->rect.x + comp->rect.width,
+                      comp->rect.y + comp->rect.height),
+              cvScalar(255),
+              CV_FILLED);
+  
+  draw_points(flow.points, flow.point_count(), tmp2, cvScalar(255));
+
+  cvAnd(tmp1, tmp2, tmp3);
+  
+  CvRect pts_bounds = cvBoundingRect(tmp3);
+
+  rect = pts_bounds;
+
+  cout << rect.x << " " << rect.y << " " << rect.width << " " << rect.height << endl;
+}                                                    
+
 void Track::reset(){
+  select_window(track_window);
   init_camshift();
-  track_object = true;
+}
+
+void Track::reset(Flow& flow){
+  select_window(track_window, flow);
+  init_camshift();
 }
 
 void Track::init_camshift(){
@@ -166,7 +205,6 @@ void Track::init_camshift(){
   cvSplit(hsv, hue, 0, 0, 0);
   
   float max_val = 0.f;
-  select_window(track_window);
   cvSetImageROI(hue, track_window);
   cvSetImageROI(mask, track_window);
   cvCalcHist(&hue, hist, 0, mask);
@@ -174,8 +212,6 @@ void Track::init_camshift(){
   cvConvertScale(hist->bins, hist->bins, max_val ? 255.0 / max_val : 0.0, 0);
   cvResetImageROI(hue);
   cvResetImageROI(mask);
-  
-  cout << "track_window: "
-       << track_window.x << "  " << track_window.y << "  " 
-       << track_window.width << "  " << track_window.height << endl;
+
+  track_object = true;
 }

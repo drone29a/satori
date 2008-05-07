@@ -157,7 +157,7 @@ int SatoriApp::run_webcam(bool verbose){
         do_track = !do_track;
         break;
       case 'r':
-        track.reset();
+        track.reset(flow);
         break;
       default:
         ;

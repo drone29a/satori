@@ -17,6 +17,7 @@
 
 // includes
 #include "common.h"
+#include "flow.h"
 #include "cv.h"
 #include "highgui.h"
 #include <iostream>
@@ -39,7 +40,8 @@ class Track{
   ~Track();
   
   void update(IplImage*); // update the motion segments        
-  void reset(); // reset object to track
+  void reset(); // reset to largest segment
+  void reset(Flow&);
   CvSeq* segments(); // return found motion segments
   const CvConnectedComp* largest_segment();
   const CvBox2D& track_box() const; // return ref to tracked area
@@ -56,7 +58,7 @@ class Track{
   bool segs_sorted;
 
   // variables for camshift
-  IplImage *hsv, *hue, *backproject, *mask;
+  IplImage *hsv, *hue, *backproject, *mask, *tmp1, *tmp2, *tmp3;
   CvHistogram *hist;
   CvBox2D _track_box;
   CvConnectedComp track_comp;
@@ -68,7 +70,8 @@ class Track{
   // methods
   void update_motion_segments(IplImage*);
   void update_camshift(IplImage*);
-  void select_window(CvRect&); // find the best start window
+  void select_window(CvRect&);
+  void select_window(CvRect&, Flow&);
   void init_camshift();
 };
 

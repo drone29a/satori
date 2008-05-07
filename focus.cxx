@@ -97,10 +97,7 @@ int Focus::intersect_count(CvPoint* verts, int num_verts,
   cvFillConvexPoly(poly_img, verts, num_verts, cvScalar(255));
   
   // Draw points
-  for (int i = 0; i < num_pts; ++i){
-     cvRectangle(point_img, cvPointFrom32f(pts[i]), cvPointFrom32f(pts[i]),
-                 cvScalar(255), CV_FILLED);
-  }
+  draw_points(pts, num_pts, point_img, cvScalar(255));
   
   cvAnd(poly_img, point_img, and_img);
 
