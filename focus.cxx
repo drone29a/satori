@@ -52,20 +52,17 @@ void Focus::update(const CvBox2D* track_box,
     float cam_density = density(track_box, feature_points, num_points);
     float seg_density = density(motion_seg, feature_points, num_points);
     float seg_cam_density_ratio = seg_density / cam_density;
-//     cout << cam_density << " " << seg_density << " " 
-//          << seg_cam_density_ratio << " " << cam_frame_size_ratio << " "
-//          << seg_amt << " " << cam_amt << endl;
   
-    // If density is significantly higher in motion_seg, change focus
-    if (seg_cam_density_ratio > 2.f && 
+    // Decide whether to change focus
+    if (//(seg_cam_density_ratio > 1.08f || seg_cam_point_count_ratio > 0.7) && 
         cam_frame_size_ratio > 0.4f && 
         (seg_amt < 0.65f || cam_amt < 0.65f)) {
       changed = true;
     }
-
+        
     cout << "density ";
     
-    if (seg_cam_density_ratio > 2.f){
+    if (seg_cam_density_ratio > 1.08f){
       cout << "CHANGE ";
     }
     else{
@@ -101,9 +98,6 @@ void Focus::update(const CvBox2D* track_box,
     else{
       cout << "STAY" << endl;
     }
-
-    cout << seg_amt << " " << cam_amt << " " << area << endl;
-
   }
 }
 

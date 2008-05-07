@@ -52,4 +52,6 @@ void intersect_amount(IplImage* x, IplImage* y, IplImage* dst,
   area = (float)(db.width * db.height);
   x_amt = ((float)xib.width*xib.height) / ((float)xb.width*xb.height);
   y_amt = ((float)yib.width*yib.height) / ((float)yb.width*yb.height);
+
+  cout << x_amt << " " << y_amt << endl;
 }
