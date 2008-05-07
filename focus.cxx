@@ -66,8 +66,6 @@ void Focus::update(const CvBox2D* track_box,
     float seg_density = density(motion_seg, feature_points, num_points);
     float seg_cam_density_ratio = seg_density / cam_density;
 
-    cout << intersect_area << " " << cam_frame_size_ratio << " " << cam_amt << " " << seg_amt << endl;
-
     // Decide whether to change focus
     if (points_decide){
           if ((seg_cam_density_ratio > 1.08f || seg_cam_point_count_ratio > 0.6f) && 
