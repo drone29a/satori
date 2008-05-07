@@ -23,6 +23,7 @@ static CvSize FRAME_SIZE = cvSize(640, 480);
 void draw_box(const CvBox2D*, IplImage*, const CvScalar&);
 void draw_comp(const CvConnectedComp*, IplImage*, const CvScalar&);
 void draw_points(CvPoint2D32f*, int, IplImage*, const CvScalar&);
-float intersect_amount(IplImage*, IplImage*, IplImage*);
+void intersect_amount(IplImage*, IplImage*, IplImage*, 
+                      float&, float&, float&);
 
 #endif

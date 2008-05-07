@@ -40,28 +40,70 @@ void Focus::update(const CvBox2D* track_box,
     // Check if CAMSHIFT box and motion segment largely intersect
     draw_box(track_box, poly_img, cvScalar(255));
     draw_comp(motion_seg, point_img, cvScalar(255));
-    float inter_amt = intersect_amount(point_img, poly_img, and_img);
+    float area = 0.f, cam_amt = 0.f, seg_amt = 0.f;
+    intersect_amount(point_img, poly_img, and_img,
+                     area, cam_amt, seg_amt);
     CvRect camshift_rect = cvBoundingRect(poly_img);
     CvRect seg_rect = cvBoundingRect(point_img);
     float cam_seg_size_ratio = camshift_rect.width*camshift_rect.height / seg_rect.width*seg_rect.height;
     float cam_frame_size_ratio = (float)(camshift_rect.width*camshift_rect.height) / (float)(FRAME_SIZE.width*FRAME_SIZE.height);
-    cout << camshift_rect.width << " " << camshift_rect.height << endl;
-    cout << FRAME_SIZE.width << " " << FRAME_SIZE.height << endl;
     
     // Calculate feature density for both CAMSHIFTed box and motion segment
     float cam_density = density(track_box, feature_points, num_points);
     float seg_density = density(motion_seg, feature_points, num_points);
     float seg_cam_density_ratio = seg_density / cam_density;
-    cout << cam_density << " " << seg_density << " " 
-         << seg_cam_density_ratio << " " << cam_frame_size_ratio << " "
-         << inter_amt << endl;
+//     cout << cam_density << " " << seg_density << " " 
+//          << seg_cam_density_ratio << " " << cam_frame_size_ratio << " "
+//          << seg_amt << " " << cam_amt << endl;
   
     // If density is significantly higher in motion_seg, change focus
     if (seg_cam_density_ratio > 2.f && 
         cam_frame_size_ratio > 0.4f && 
-        inter_amt < 0.65f) {
+        (seg_amt < 0.65f || cam_amt < 0.65f)) {
       changed = true;
     }
+
+    cout << "density ";
+    
+    if (seg_cam_density_ratio > 2.f){
+      cout << "CHANGE ";
+    }
+    else{
+      cout << "STAY ";
+    }
+
+    cout << " | ";
+    cout << "size ";
+
+    if (cam_frame_size_ratio > 0.4f){
+      cout << "CHANGE";
+    }
+    else{
+      cout << "STAY";
+    }
+
+    cout << " | ";
+    cout << "segment intersect ";
+
+    if (seg_amt < 0.65f){
+      cout << "CHANGE";
+    }
+    else{
+      cout << "STAY";
+    }  
+
+    cout << " | ";
+    cout << "camshift intersect ";
+
+    if (cam_amt < 0.65f){
+      cout << "CHANGE" << endl;
+    }
+    else{
+      cout << "STAY" << endl;
+    }
+
+    cout << seg_amt << " " << cam_amt << " " << area << endl;
+
   }
 }
 

@@ -23,13 +23,33 @@ void draw_points(CvPoint2D32f* pts, int num_pts, IplImage* img, const CvScalar& 
   }
 }
 
-float intersect_amount(IplImage* x, IplImage* y, IplImage* dst){
-  // the percentage of intersection is wrt the first image
+void intersect_amount(IplImage* x, IplImage* y, IplImage* dst,
+                      float& area, float& x_amt, float& y_amt){
+  // Finds the area, percentage of x, and percentage of y involved
+  // intersection.
+  IplImage* tmp = cvCreateImage(cvGetSize(dst), 8, 1);
+
   cvAnd(x, y, dst);
 
   CvRect db = cvBoundingRect(dst);
   CvRect xb = cvBoundingRect(x);
   CvRect yb = cvBoundingRect(y);
+
+  cvAnd(x, dst, tmp);
+  CvRect xib = cvBoundingRect(tmp);
+
+  cvZero(tmp);
+  cvAnd(y, dst, tmp);
+  CvRect yib = cvBoundingRect(tmp);
   
-  return (float)(db.width * db.height) / (float)(xb.width * xb.height);
+  cvRectangle(dst, 
+              cvPoint(db.x, db.y), 
+              cvPoint(db.x+db.width, db.y+db.height), 
+              cvScalar(255), CV_FILLED);
+
+  cvReleaseImage(&tmp);
+  
+  area = (float)(db.width * db.height);
+  x_amt = ((float)xib.width*xib.height) / ((float)xb.width*xb.height);
+  y_amt = ((float)yib.width*yib.height) / ((float)yb.width*yb.height);
 }
