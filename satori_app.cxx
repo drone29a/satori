@@ -179,7 +179,7 @@ int SatoriApp::run_webcam(bool verbose){
       case 'r':
         track.reset(flow);
         break;
-      case 'd':
+      case 'p':
         points_decide = !points_decide;
         break;
       default:

@@ -162,6 +162,6 @@ void display_program_commands(){
   cout << "  " << "f" << ": Toggle flow processing and feature tracking" << endl;
   cout << "  " << "t" << ": Toggle motion segmentation and object identificaion" << endl;
   cout << "  " << "r" << ": Find and track a moving object" << endl;
-  cout << "  " << "p" << ": Use point density and count in tracking decision" << endl;
+  //  cout << "  " << "p" << ": Use point density and count in tracking decision" << endl;
   cout << endl;
 }

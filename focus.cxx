@@ -75,11 +75,13 @@ void Focus::update(const CvBox2D* track_box,
           }
     }
     else{
-      if ((seg_amt < 0.15f && 
-           seg_frame_size_ratio > 0.02f) ||
-          (intersect_area > frame_area * 0.01f && 
-           cam_frame_size_ratio > 0.2f && 
-           cam_amt < 0.55f)) {
+      // the first clause detects when a better region to track exists
+      // the second clause detects camshift drifting
+      if ((seg_amt < 0.15f &&  // <15% of largest motion segment (LMS) intersects with camshift window
+           seg_frame_size_ratio > 0.02f) || // LMS' area is >2% of the frame area
+          (intersect_area > frame_area * 0.01f && // intersection area is >1% of frame area
+           cam_frame_size_ratio > 0.2f && // camshift window's area is >20% of frame area
+           cam_amt < 0.55f)) { // <55% of camshift window intersects with LMS
         changed = true;
         if (seg_amt < 0.15f && seg_frame_size_ratio > 0.02f){
         }
