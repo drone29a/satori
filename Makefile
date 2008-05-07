@@ -32,8 +32,8 @@ POUT = satori
 #
 
 # build program
-all: satori.o satori_app.o flow.o track.o focus.o
-	$(CC) $(CFLAGS) $(OPENCVL) $(BOOSTFSL) satori.o satori_app.o flow.o track.o focus.o -o $(POUT)
+all: satori.o satori_app.o flow.o track.o focus.o common.o
+	$(CC) $(CFLAGS) $(OPENCVL) $(BOOSTFSL) satori.o satori_app.o flow.o track.o focus.o common.o -o $(POUT)
 
 # compile program
 satori.o: satori.cxx satori.h
@@ -54,6 +54,10 @@ track.o: track.cxx track.h img_template.tpl
 # compile focus component of program
 focus.o: focus.cxx focus.h img_template.tpl
 	$(CC) -c $(DFLAGS) $(OPENCVI) $(OPTI) focus.cxx
+
+# compile common functions
+common.o: common.cxx
+	$(CC) -c $(DFLAGS) $(OPENCVI) $(OPTI) common.cxx	
 
 # clean products of compile and build
 clean:

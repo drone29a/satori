@@ -35,13 +35,20 @@ void Focus::update(const CvBox2D* track_box,
     and_img = cvCreateImage(frame_size, 8, 1);
   }
 
-  // Check if CAMSHIFT box and motion segment largely intersect
-
   if (track_box && motion_seg && feature_points){
 
+    // Check if CAMSHIFT box and motion segment largely intersect
+    draw_box(track_box, poly_img, cvScalar(255));
+    draw_comp(motion_seg, point_img, cvScalar(255));
+    float inter_amt = intersect_amount(poly_img, point_img, and_img);
+    CvRect camshift_rect = cvBoundingRect(poly_img);
+    CvRect seg_rect = cvBoundingRect(point_img);
+    float size_ratio = camshift_rect.width*camshift_rect.height / seg_rect.width*seg_rect.height;
+    
     // Calculate feature density for both CAMSHIFTed box and motion segment
     float cam_density = density(track_box, feature_points, num_points);
     float seg_density = density(motion_seg, feature_points, num_points);
+    cout << cam_density << " " << seg_density << endl;
     float density_ratio = seg_density / cam_density;
   
     // If density is significantly higher in motion_seg, change focus
@@ -73,8 +80,8 @@ float Focus::density(const CvConnectedComp* comp, CvPoint2D32f* pts, int num_pts
   CvPoint v[4];
   v[0] = cvPoint(comp->rect.x, comp->rect.y);
   v[1] = cvPoint(comp->rect.x + comp->rect.width, comp->rect.y);
-  v[2] = cvPoint(comp->rect.x + comp->rect.width, comp->rect.y - comp->rect.height);
-  v[3] = cvPoint(comp->rect.x, comp->rect.y - comp->rect.height);
+  v[2] = cvPoint(comp->rect.x + comp->rect.width, comp->rect.y + comp->rect.height);
+  v[3] = cvPoint(comp->rect.x, comp->rect.y + comp->rect.height);
   
   float count = (float)intersect_count(v, 4, pts, num_pts);
   return count / (float)(comp->rect.width * comp->rect.height);
@@ -87,16 +94,16 @@ int Focus::intersect_count(CvPoint* verts, int num_verts,
   cvZero(and_img);
   
   // Draw polygon
-  cvFillConvexPoly(poly_img, verts, num_verts, cvScalar(1));
+  cvFillConvexPoly(poly_img, verts, num_verts, cvScalar(255));
   
   // Draw points
   for (int i = 0; i < num_pts; ++i){
-    cvRectangle(point_img, cvPointFrom32f(pts[i]), cvPointFrom32f(pts[i]),
-                cvScalar(1), CV_FILLED);
+     cvRectangle(point_img, cvPointFrom32f(pts[i]), cvPointFrom32f(pts[i]),
+                 cvScalar(255), CV_FILLED);
   }
   
   cvAnd(poly_img, point_img, and_img);
-  
+
   int count = cvCountNonZero(and_img);
 
   return count;
