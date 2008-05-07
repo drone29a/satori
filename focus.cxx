@@ -78,7 +78,7 @@ void Focus::update(const CvBox2D* track_box,
       if ((seg_amt < 0.15f && 
            seg_frame_size_ratio > 0.02f) ||
           (intersect_area > frame_area * 0.01f && 
-           cam_frame_size_ratio > 0.3f && 
+           cam_frame_size_ratio > 0.2f && 
            cam_amt < 0.55f)) {
         changed = true;
         if (seg_amt < 0.15f && seg_frame_size_ratio > 0.02f){
