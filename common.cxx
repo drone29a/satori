@@ -39,8 +39,6 @@ void intersect_amount(IplImage* x, IplImage* y, IplImage* dst,
   cvZero(tmp);
   cvAnd(x, dst, tmp);
   CvRect xib = cvBoundingRect(tmp);
-  cout << "xb: " << xb.x << " " << xb.y << " " << xb.width << " " << xb.height << endl;
-  cout << "xib: " << xib.x << " " << xib.y << " " << xib.width << " " << xib.height << endl;
 
   cvZero(tmp);
   cvAnd(y, dst, tmp);
