@@ -10,6 +10,7 @@
 
 #include "satori_app.h" 	// flow header file
 #include "img_template.tpl"	// provides efficient access to pixels
+#include "common.h"
 
 // Constructors
 
@@ -92,13 +93,17 @@ int SatoriApp::run_webcam(bool verbose){
     return -1;
   }
 
+  IplImage *frame = NULL;
+  frame = cvQueryFrame(capture);
+  FRAME_SIZE = cvGetSize(frame);
+
   cvNamedWindow("Webcam_Capture", 0 );
 
   IplImage *image = NULL, *prev_grey = NULL, *grey = NULL, *ann_image = NULL;
 
   for(;;){
   
-    IplImage* frame = NULL;
+    frame = NULL;
   
     frame = cvQueryFrame(capture);
     if( !frame )

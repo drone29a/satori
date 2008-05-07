@@ -29,9 +29,9 @@ Track::Track(){
   vmin = 10;
   vmax = 256;
   smin = 30;
-  tmp1 = cvCreateImage(cvSize(FRAME_WIDTH, FRAME_HEIGHT), 8, 1);
-  tmp2 = cvCreateImage(cvSize(FRAME_WIDTH, FRAME_HEIGHT), 8, 1);
-  tmp3 = cvCreateImage(cvSize(FRAME_WIDTH, FRAME_HEIGHT), 8, 1);
+  tmp1 = cvCreateImage(FRAME_SIZE, 8, 1);
+  tmp2 = cvCreateImage(FRAME_SIZE, 8, 1);
+  tmp3 = cvCreateImage(FRAME_SIZE, 8, 1);
 }
 
 Track::~Track(){  
@@ -160,8 +160,14 @@ const CvBox2D& Track::track_box() const{
 }
 
 void Track::select_window(CvRect& rect){
-  CvRect comp_rect = largest_segment()->rect;
-  rect = comp_rect;
+  const CvConnectedComp* comp = largest_segment();
+  if (comp){
+    CvRect comp_rect = largest_segment()->rect;
+    rect = comp_rect;
+  }
+  else{
+    rect = cvRect(0, 0, 1, 1);
+  }
 }
 
 void Track::select_window(CvRect& rect, Flow& flow){
@@ -170,22 +176,34 @@ void Track::select_window(CvRect& rect, Flow& flow){
   cvZero(tmp3);
 
   const CvConnectedComp* comp = largest_segment();
-  cvRectangle(tmp1, 
-              cvPoint(comp->rect.x, comp->rect.y),
-              cvPoint(comp->rect.x + comp->rect.width,
-                      comp->rect.y + comp->rect.height),
-              cvScalar(255),
-              CV_FILLED);
+
+  if (comp){
+    cvRectangle(tmp1, 
+                cvPoint(comp->rect.x, comp->rect.y),
+                cvPoint(comp->rect.x + comp->rect.width,
+                        comp->rect.y + comp->rect.height),
+                cvScalar(255),
+                CV_FILLED);
   
-  draw_points(flow.points, flow.point_count(), tmp2, cvScalar(255));
+    draw_points(flow.points, flow.point_count(), tmp2, cvScalar(255));
 
-  cvAnd(tmp1, tmp2, tmp3);
+    cvAnd(tmp1, tmp2, tmp3);
   
-  CvRect pts_bounds = cvBoundingRect(tmp3);
+    CvRect pts_bounds = cvBoundingRect(tmp3);
 
-  rect = pts_bounds;
+    rect = pts_bounds;
 
-  cout << rect.x << " " << rect.y << " " << rect.width << " " << rect.height << endl;
+    if (rect.width == 0){
+      rect.width = 1;
+    }
+  
+    if (rect.height == 0){
+      rect.height = 1;
+    }
+  }
+  else{
+    rect = cvRect(0, 0, 1, 1);
+  }
 }                                                    
 
 void Track::reset(){

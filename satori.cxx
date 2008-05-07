@@ -25,7 +25,6 @@
 
 #include "satori.h"	// program header
 #include "satori_app.h"
-#include "flow.h"
 
 int main(int argc, char *argv[]){
 

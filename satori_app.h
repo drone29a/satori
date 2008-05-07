@@ -6,7 +6,6 @@
 #define _SATORI_APP_H_
 
 // includes
-#include "common.h"
 #include "flow.h"
 #include "track.h"
 #include "focus.h"
